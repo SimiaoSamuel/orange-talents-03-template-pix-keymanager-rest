@@ -1,0 +1,10 @@
+micronaut:
+  application:
+    name: keymanagerrest
+
+grpc:
+  channels:
+    keymanager:
+      address: '${KEYMANAGER_SERVER:`localhost:50051`}'
+      plaintext: true
+      max-retry-attempts: 10

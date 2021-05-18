@@ -1,0 +1,102 @@
+syntax = "proto3";
+
+option java_multiple_files = true;
+option java_package = "br.com.zup.edu";
+option java_outer_classname = "Keymanagergrpc";
+option objc_class_prefix = "HLW";
+
+package br.com.zup.edu;
+
+import "google/protobuf/timestamp.proto";
+
+service KeymanagergrpcService {
+  rpc cria (CreateKeyRequest) returns (CreateKeyResponse) {}
+  rpc deleta (DeleteKeyRequest) returns (DeleteKeyResponse) {}
+  rpc busca (SearchKeyRequest) returns (SearchKeyResponse) {}
+  rpc lista (ListKeyRequest) returns (ListKeyResponse) {}
+}
+
+enum KeyType {
+  CPF = 0;
+  PHONE = 1;
+  EMAIL = 2;
+  RANDOM = 3;
+}
+
+enum AccountType {
+  CONTA_CORRENTE = 0;
+  CONTA_POUPANCA = 1;
+}
+
+message CreateKeyRequest {
+  string idCliente = 1;
+  KeyType tipoChave = 2;
+  string chave = 3;
+  AccountType tipoConta = 4;
+}
+
+message CreateKeyResponse {
+  int64 idPix = 1;
+}
+
+message DeleteKeyRequest {
+  int64 idPix = 1;
+  string idCliente = 2;
+}
+
+message DeleteKeyResponse{}
+
+message SearchKeyRequest{
+  message SearchPixId{
+    int64 idPix = 1;
+    string idCliente = 2;
+  }
+
+  oneof Search{
+    SearchPixId pixCliente = 1;
+    string pixValue = 2;
+  }
+}
+
+message Titular{
+  string nome = 1;
+  string cpf = 2;
+}
+
+message Conta{
+  string intituicao = 1;
+  string agencia = 2;
+  string numeroConta = 3;
+  AccountType tipoConta = 4;
+}
+
+message PixKey{
+  KeyType tipoChave = 1;
+  string chave = 2;
+  Titular nome = 3;
+  Conta conta = 4;
+}
+
+message SearchKeyResponse{
+  int64 idPix = 1;
+  string idCliente = 2;
+  PixKey pix = 3;
+  google.protobuf.Timestamp dataCriacao = 4;
+}
+
+message ListKeyRequest{
+  string idCliente = 1;
+}
+
+message KeyEntityResponse{
+  int64 idPix = 1;
+  KeyType tipoChave = 2;
+  string chave = 3;
+  AccountType tipoConta = 4;
+  google.protobuf.Timestamp dataCriacao = 5;
+}
+
+message ListKeyResponse{
+  string idCliente = 1;
+  repeated KeyEntityResponse key = 2;
+}
