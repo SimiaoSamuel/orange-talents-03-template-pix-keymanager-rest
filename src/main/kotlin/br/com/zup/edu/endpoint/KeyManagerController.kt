@@ -1,9 +1,7 @@
 package br.com.zup.edu.endpoint
 
-import br.com.zup.edu.CreateKeyRequest
-import br.com.zup.edu.KeymanagergrpcServiceGrpc
-import br.com.zup.edu.dto.SavePixRequest
-import br.com.zup.edu.dto.SavePixResponse
+import br.com.zup.edu.*
+import br.com.zup.edu.dto.*
 import br.com.zup.edu.handler.ErrorDto
 import br.com.zup.edu.handler.validation.ValidUUID
 import br.com.zup.edu.shared.OpenClass
@@ -15,6 +13,7 @@ import io.micronaut.http.HttpStatus
 import io.micronaut.http.MutableHttpResponse
 import io.micronaut.http.annotation.*
 import io.micronaut.validation.Validated
+import java.awt.print.Pageable
 import java.util.*
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -24,20 +23,72 @@ import javax.validation.constraints.NotBlank
 import javax.validation.constraints.NotNull
 import javax.validation.constraints.Size
 
-@Controller("/api/clientes/{idCliente}/pix")
+@Controller("/api")
 @OpenClass
 @Validated
 class KeyManagerController(@Inject val grpcClient: KeymanagergrpcServiceGrpc.KeymanagergrpcServiceBlockingStub) {
 
-    @Post
-    fun savePix(@Valid saveRequest: SavePixRequest,
-                @PathVariable @ValidUUID idCliente: UUID): HttpResponse<Any> {
+    @Post("/clientes/{idCliente}/pix")
+    fun savePix(
+        @Valid saveRequest: SavePixRequest,
+        @PathVariable @ValidUUID idCliente: UUID
+    ): HttpResponse<Any> {
         val request = saveRequest.converte(idCliente)
 
         val response = grpcClient.cria(request)
         val location = HttpResponse.uri("api/clientes/$idCliente/pix/${response.idPix}")
 
         return HttpResponse.created(location)
+    }
+
+    @Delete("/clientes/{idCliente}/pix/{idPix}")
+    fun deletePix(@PathVariable @ValidUUID idCliente: UUID, @PathVariable idPix: Long): MutableHttpResponse<Any> {
+        val request = DeleteKeyRequest.newBuilder()
+            .setIdCliente(idCliente.toString())
+            .setIdPix(idPix)
+            .build()
+
+        grpcClient.deleta(request)
+
+        return HttpResponse.noContent()
+    }
+
+    @Get("/clientes/{idCliente}/pix/{idPix}")
+    fun getPix(
+        @PathVariable @ValidUUID idCliente: UUID,
+        @PathVariable idPix: Long
+    ): MutableHttpResponse<DetailPixResponse> {
+        val request = SearchKeyRequest.newBuilder()
+            .setPixCliente(
+                SearchKeyRequest.SearchPixId.newBuilder()
+                    .setIdPix(idPix)
+                    .setIdCliente(idCliente.toString())
+                    .build()
+            )
+            .build()
+        val response = grpcClient.busca(request)
+
+        return HttpResponse.ok(response.toDto())
+    }
+
+    @Get("/public/pix/{key}")
+    fun getPixByChave(@PathVariable @NotBlank key: String): MutableHttpResponse<DetailPixResponse> {
+        val request = SearchKeyRequest.newBuilder()
+            .setPixValue(key)
+            .build()
+        val response = grpcClient.busca(request)
+
+        return HttpResponse.ok(response.toDto())
+    }
+
+    @Get("/clientes/{idCliente}/pix")
+    fun getAllPix(@PathVariable @ValidUUID idCliente: UUID): MutableHttpResponse<ListaPixDtos> {
+        val request = ListKeyRequest.newBuilder()
+            .setIdCliente(idCliente.toString())
+            .build()
+        val response = grpcClient.lista(request)
+
+        return HttpResponse.ok(response.toDto())
     }
 
     @Error(global = true)

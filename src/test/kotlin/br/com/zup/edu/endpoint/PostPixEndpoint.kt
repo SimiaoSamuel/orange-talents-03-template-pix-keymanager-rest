@@ -1,16 +1,13 @@
 package br.com.zup.edu.endpoint
 
-import br.com.zup.edu.CreateKeyRequest
 import br.com.zup.edu.CreateKeyResponse
 import br.com.zup.edu.KeymanagergrpcServiceGrpc
-import br.com.zup.edu.dto.AccountTypeRequest
-import br.com.zup.edu.dto.KeyTypeRequest
+import br.com.zup.edu.dto.AccountTypeDto
+import br.com.zup.edu.dto.KeyTypeDto
 import br.com.zup.edu.dto.SavePixRequest
 import br.com.zup.edu.dto.SavePixResponse
 import br.com.zup.edu.factory.GrpcFactory
-import com.google.api.Http
 import io.grpc.Status
-import io.grpc.StatusRuntimeException
 import io.micronaut.context.annotation.Factory
 import io.micronaut.context.annotation.Replaces
 import io.micronaut.http.HttpRequest
@@ -23,12 +20,10 @@ import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
-import org.junit.jupiter.params.provider.ValueSource
 import org.mockito.Mockito
 import java.util.*
 import javax.inject.Inject
 import javax.inject.Singleton
-import javax.validation.ConstraintViolationException
 
 @MicronautTest
 class PostPixEndpoint {
@@ -48,9 +43,9 @@ class PostPixEndpoint {
     @Test
     fun `salvando pix com dados valido`(){
         val savePixRequest = SavePixRequest(
-            keyType = KeyTypeRequest.CPF,
+            keyType = KeyTypeDto.CPF,
             key = "48710110110",
-            accountType = AccountTypeRequest.CONTA_CORRENTE
+            accountType = AccountTypeDto.CONTA_CORRENTE
         )
 
         val idCliente = "c56dfef4-7901-44fb-84e2-a2cefb157890"
@@ -100,9 +95,9 @@ class PostPixEndpoint {
     @Test
     fun `requisicao com uuid invalido`(){
         val savePixRequest = SavePixRequest(
-            keyType = KeyTypeRequest.CPF,
+            keyType = KeyTypeDto.CPF,
             key = "48710110110",
-            accountType = AccountTypeRequest.CONTA_CORRENTE
+            accountType = AccountTypeDto.CONTA_CORRENTE
         )
 
         val idCliente = "c5-79-4b-82-a2ce"
@@ -123,9 +118,9 @@ class PostPixEndpoint {
     @Test
     fun `se pix existe deve lancar already exists exception`(){
         val savePixRequest = SavePixRequest(
-            keyType = KeyTypeRequest.CPF,
+            keyType = KeyTypeDto.CPF,
             key = "48710110110",
-            accountType = AccountTypeRequest.CONTA_CORRENTE
+            accountType = AccountTypeDto.CONTA_CORRENTE
         )
 
         val idCliente = "c56dfef4-7901-44fb-84e2-a2cefb157890"
@@ -149,9 +144,9 @@ class PostPixEndpoint {
     @Test
     fun `se usuario nao existe deve lancar not found exception`(){
         val savePixRequest = SavePixRequest(
-            keyType = KeyTypeRequest.CPF,
+            keyType = KeyTypeDto.CPF,
             key = "48710110110",
-            accountType = AccountTypeRequest.CONTA_CORRENTE
+            accountType = AccountTypeDto.CONTA_CORRENTE
         )
 
         val idCliente = "c56dfef4-7901-44fb-84e2-a2cefb157891"
@@ -175,9 +170,9 @@ class PostPixEndpoint {
     @Test
     fun `se usuario nao e dono da chave deve lancar permission denied exception`(){
         val savePixRequest = SavePixRequest(
-            keyType = KeyTypeRequest.CPF,
+            keyType = KeyTypeDto.CPF,
             key = "48710110110",
-            accountType = AccountTypeRequest.CONTA_CORRENTE
+            accountType = AccountTypeDto.CONTA_CORRENTE
         )
 
         val idCliente = "c56dfef4-7901-44fb-84e2-a2cefb157890"
@@ -201,9 +196,9 @@ class PostPixEndpoint {
     @Test
     fun `se requisicao bater no grpc com dados invalidos deve lancar invalid argument exception`(){
         val savePixRequest = SavePixRequest(
-            keyType = KeyTypeRequest.CPF,
+            keyType = KeyTypeDto.CPF,
             key = "48710110110",
-            accountType = AccountTypeRequest.CONTA_CORRENTE
+            accountType = AccountTypeDto.CONTA_CORRENTE
         )
 
         val idCliente = "c56dfef4-7901-44fb-84e2-a2cefb157890"
@@ -227,9 +222,9 @@ class PostPixEndpoint {
     @Test
     fun `se grpc nao estiver funcionado deve lancar unavailable exception`(){
         val savePixRequest = SavePixRequest(
-            keyType = KeyTypeRequest.CPF,
+            keyType = KeyTypeDto.CPF,
             key = "48710110110",
-            accountType = AccountTypeRequest.CONTA_CORRENTE
+            accountType = AccountTypeDto.CONTA_CORRENTE
         )
 
         val idCliente = "c56dfef4-7901-44fb-84e2-a2cefb157890"
@@ -253,9 +248,9 @@ class PostPixEndpoint {
     @Test
     fun `se retornar um erro inesperado deve lancar internal server error exception`(){
         val savePixRequest = SavePixRequest(
-            keyType = KeyTypeRequest.CPF,
+            keyType = KeyTypeDto.CPF,
             key = "48710110110",
-            accountType = AccountTypeRequest.CONTA_POUPANCA
+            accountType = AccountTypeDto.CONTA_POUPANCA
         )
 
         val idCliente = "c56dfef4-7901-44fb-84e2-a2cefb157890"
